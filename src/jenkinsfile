@@ -35,26 +35,33 @@ pipeline {
 
         stage('Build & Test') {
             steps {
+                    dir('src') {
                 sh 'mvn clean install'
+            }
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
+                dir('src') {
                 withSonarQubeEnv('SonarQube') {
                     sh 'mvn sonar:sonar'
                 }
             }
         }
+        }
 
         stage('Verify JAR in Target') {
             steps {
+                dir('src') {
                 sh 'ls -lh target'
+            }
             }
         }
 
         stage('Deploy to Artifactory') {
             steps {
+                dir('src') {
                 script {
                     try {
                         def server = Artifactory.newServer url: "${ARTIFACTORY_URL}", credentialsId: "${ARTIFACTORY_CREDENTIALS}"
@@ -76,6 +83,7 @@ pipeline {
                 }
             }
         }
+}
 
         stage('Docker Build & Push') {
             steps {
